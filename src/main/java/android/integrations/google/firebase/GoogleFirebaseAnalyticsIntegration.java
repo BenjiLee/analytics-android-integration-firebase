@@ -2,6 +2,7 @@ package android.integrations.google.firebase;
 
 import android.Manifest;
 import android.content.Context;
+import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.segment.analytics.Analytics;
@@ -23,12 +24,9 @@ public class GoogleFirebaseAnalyticsIntegration extends Integration<Void> {
             }
 
             Context context = analytics.getApplication();
-
-            FirebaseAnalytics mFirebaseAnalytics;
-            mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-
-            return new GoogleFirebaseAnalyticsIntegration(analytics, settings);
+            return new GoogleFirebaseAnalyticsIntegration(context, analytics, settings);
         }
+
         @Override
         public String key() {
             return GOOGLE_FIREBASE_KEY;
@@ -36,11 +34,25 @@ public class GoogleFirebaseAnalyticsIntegration extends Integration<Void> {
     };
 
     private static final String GOOGLE_FIREBASE_KEY = "Google Firebase Analytics";
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    GoogleFirebaseAnalyticsIntegration(Context context, Analytics analytics, ValueMap settings) {
+        this.mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+    }
 
     @Override
     public void track(TrackPayload track) {
         super.track(track);
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "1234");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "this is a test event:" + track.event());
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "testing");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
+
     }
+
     GoogleFirebaseAnalyticsIntegration(Analytics analytics, ValueMap settings) {
     }
 }
