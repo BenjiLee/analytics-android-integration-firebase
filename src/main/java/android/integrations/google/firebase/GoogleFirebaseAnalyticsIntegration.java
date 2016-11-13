@@ -9,6 +9,7 @@ import com.segment.analytics.Analytics;
 import com.segment.analytics.ValueMap;
 import com.segment.analytics.integrations.Integration;
 import com.segment.analytics.integrations.Logger;
+import com.segment.analytics.integrations.ScreenPayload;
 import com.segment.analytics.integrations.TrackPayload;
 
 import static com.segment.analytics.internal.Utils.hasPermission;
@@ -24,7 +25,7 @@ public class GoogleFirebaseAnalyticsIntegration extends Integration<Void> {
             }
 
             Context context = analytics.getApplication();
-            return new GoogleFirebaseAnalyticsIntegration(context, analytics, settings);
+            return new GoogleFirebaseAnalyticsIntegration(context, analytics, settings, logger);
         }
 
         @Override
@@ -35,9 +36,12 @@ public class GoogleFirebaseAnalyticsIntegration extends Integration<Void> {
 
     private static final String GOOGLE_FIREBASE_KEY = "Google Firebase Analytics";
     private FirebaseAnalytics mFirebaseAnalytics;
+    final Logger logger;
 
-    GoogleFirebaseAnalyticsIntegration(Context context, Analytics analytics, ValueMap settings) {
+    GoogleFirebaseAnalyticsIntegration(Context context, Analytics analytics, ValueMap settings,
+                                       Logger logger) {
         this.mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+        this.logger = logger;
     }
 
     @Override
@@ -49,10 +53,16 @@ public class GoogleFirebaseAnalyticsIntegration extends Integration<Void> {
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "this is a test event:" + track.event());
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "testing");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
-
     }
 
-    GoogleFirebaseAnalyticsIntegration(Analytics analytics, ValueMap settings) {
+    @Override
+    public void screen(ScreenPayload screen) {
+        super.screen(screen);
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "1234");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "this is a test event:" + screen.event());
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "testing");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 }
